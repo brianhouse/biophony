@@ -1,0 +1,12 @@
+syntax: glob
+
+__pycache__
+*.pyc
+.DS_Store
+docs
+housepy
+config.yaml
+data.db
+signal_processing
+*.wav
+research
