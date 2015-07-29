@@ -9,8 +9,9 @@ from plotter import plot
 from sound import SoundSignal
 
 filename = "output.wav"
-filename = "camp_2_11hz_16_mono.wav"
-filename = "boat_sample_11hz_16_mono_short.wav"
+filename = "camp_2_11khz_16_mono.wav"
+filename = "boat_sample_11khz_16_mono_short.wav"
+filename = "boat_sample_96khz_24_mono_short.wav"
 
 sound = SoundSignal().load(filename)
 # sound = SoundSignal().record(5)

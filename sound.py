@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from housepy import log, util
 
 """
-    Does this need to be 96khz/24-bit? Or is the purpose to be lo-fi?
+    Does this need to be 96khz?
 
 """
 
@@ -15,7 +15,7 @@ class SoundSignal(object):
     def __init__(self, bits=16):
         self.signal = None
         self.bits = bits
-        if self.bits != 16:
+        if self.bits != 16 and self.bits != 24:
             raise NotImplementedError
         self.size = None
         self.frequency = None
@@ -27,7 +27,7 @@ class SoundSignal(object):
         log.info("--> loading from %s" % path)
         self.path = path
         self.wf = wave.open(self.path, 'rb')
-        self.signal = np.fromstring(self.wf.readframes(-1), 'Int16')
+        self.signal = np.fromstring(self.wf.readframes(-1), 'Int24' if self.bits == 24 else 'Int16')
         self.wf.rewind()
         self.frequency = self.wf.getframerate()
         self.size = len(self.signal)
@@ -95,7 +95,7 @@ class SoundSignal(object):
         # need a window @ 25 hz, 0.04 seconds
         # 0.04 / (1 / sampling_rate)
         # at 11025, that's 441
-        # so at that sampling_rate and higher, 512 is good
+        # so at that sampling_rate and higher, 512 is good        
         block_size = 512
 
         # set up plot
