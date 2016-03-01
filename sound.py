@@ -12,13 +12,11 @@ CHUNK = 1024
 
 class SoundSignal(object):
 
-    def __init__(self, bits=16):
+    def __init__(self):
         self.signal = None
-        self.bits = bits
-        if self.bits != 16 and self.bits != 24:
-            raise NotImplementedError
-        self.size = None
-        self.frequency = None
+        self.bits = None
+        self.rate = None
+        self.size = None        
         self.path = None
         self.wf = None
 
@@ -27,12 +25,16 @@ class SoundSignal(object):
         log.info("--> loading from %s" % path)
         self.path = path
         self.wf = wave.open(self.path, 'rb')
-        self.signal = np.fromstring(self.wf.readframes(-1), 'Int24' if self.bits == 24 else 'Int16')
+        self.bits = self.wf.getsampwidth() * 8
+        if self.bits != 16:
+            raise NotImplementedError
+        self.signal = np.fromstring(self.wf.readframes(-1), 'Int16')
         self.wf.rewind()
-        self.frequency = self.wf.getframerate()
+        self.rate = self.wf.getframerate()
         self.size = len(self.signal)
-        self.duration = self.size / self.frequency        
-        log.info("--> frequency %s" % self.frequency)
+        self.duration = self.size / self.rate        
+        log.info("--> bits %s" % self.bits)
+        log.info("--> rate %s" % self.rate)
         log.info("--> size %s" % self.size)
         log.info("--> duration %fs" % self.duration)
         return self
@@ -101,17 +103,16 @@ class SoundSignal(object):
         # set up plot
         plt.rcParams['toolbar'] = 'None'
         plt.figure(frameon=True, figsize=(15, 8), dpi=80, facecolor=(1., 1., 1.), edgecolor=(1., 1., 1.))
-
+        
         # show amplitude domain
         plt.subplot(2, 1, 1, axisbg=(1., 1., 1.))
         plt.plot(self.signal, color=(1., 0., 0.))
-
+        plt.axis([0.0, self.duration * self.rate, 0-(2**self.bits/2), 2**self.bits/2]) # go to bitrate
+        
         # show spectrogram
         plt.subplot(2, 1, 2, axisbg='#ffffff')
-
         block_overlap = block_size / 2 # power of two, default is 128
-        Pxx, freqs, t, plot = plt.specgram(self.signal, NFFT=block_size, Fs=self.frequency, noverlap=block_overlap)
-
-        plt.axis([0.0, self.duration, 0, self.frequency/2])
+        Pxx, freqs, t, plot = plt.specgram(self.signal, NFFT=block_size, Fs=self.rate, noverlap=block_overlap)
+        plt.axis([0.0, self.duration, 0, self.rate/2])
 
         plt.show()

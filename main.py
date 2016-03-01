@@ -12,6 +12,9 @@ filename = "output.wav"
 filename = "camp_2_11khz_16_mono.wav"
 filename = "boat_sample_11khz_16_mono_short.wav"
 filename = "boat_sample_96khz_24_mono_short.wav"
+filename = "robin_chat_sample_11k_16_mono.wav"
+filename = "robin_chat_sample_96k_16_mono.wav"
+filename = "robin_chat_sample_96k_24_mono.wav"
 
 sound = SoundSignal().load(filename)
 # sound = SoundSignal().record(5)
@@ -23,3 +26,6 @@ sound = SoundSignal().load(filename)
 
 sound.plot()
 # sound.play()
+
+
+## 24-bit does not work
