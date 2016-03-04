@@ -106,13 +106,22 @@ class SoundSignal(object):
         
         # show amplitude domain
         plt.subplot(2, 1, 1, axisbg=(1., 1., 1.))
-        plt.plot(self.signal, color=(1., 0., 0.))
+        plt.plot(self.signal, color=(1., 0., 0.))        
         plt.axis([0.0, self.duration * self.rate, 0-(2**self.bits/2), 2**self.bits/2]) # go to bitrate
+        # plt.xlabel("Samples")
+        # plt.ylabel("Amplitude")
         
         # show spectrogram
         plt.subplot(2, 1, 2, axisbg='#ffffff')
+        # plt.subplot(1, 1, 1, axisbg='#ffffff')
         block_overlap = block_size / 2 # power of two, default is 128
         Pxx, freqs, t, plot = plt.specgram(self.signal, NFFT=block_size, Fs=self.rate, noverlap=block_overlap)
         plt.axis([0.0, self.duration, 0, self.rate/2])
+        # plt.xlabel("Seconds")
+        # plt.ylabel("Frequency")
+
+        # plt.suptitle(self.path)
+        fig = plt.gcf()
+        fig.canvas.set_window_title(self.path)        
 
         plt.show()
