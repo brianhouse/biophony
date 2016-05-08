@@ -3,11 +3,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from housepy import log, util
 
-"""
-    Does this need to be 96khz?
-
-"""
-
 CHUNK = 1024
 
 class SoundSignal(object):
@@ -115,7 +110,7 @@ class SoundSignal(object):
         plt.subplot(2, 1, 2, axisbg='#ffffff')
         # plt.subplot(1, 1, 1, axisbg='#ffffff')
         block_overlap = block_size / 2 # power of two, default is 128
-        Pxx, freqs, t, plot = plt.specgram(self.signal, NFFT=block_size, Fs=self.rate, noverlap=block_overlap)
+        spectrum, freqs, t, image = plt.specgram(self.signal, NFFT=block_size, Fs=self.rate, noverlap=block_overlap)
         plt.axis([0.0, self.duration, 0, self.rate/2])
         # plt.xlabel("Seconds")
         # plt.ylabel("Frequency")
@@ -125,3 +120,64 @@ class SoundSignal(object):
         fig.canvas.set_window_title(self.path)        
 
         plt.show()
+
+        print("spectrum", spectrum)
+        print(len(spectrum[0]))         # 257 rows of 4154 columns. 
+        print()
+        print("freqs", freqs)
+        print(len(freqs))
+        print()
+        print("t", t)
+        print(len(t))
+
+
+"""
+http://matplotlib.org/api/pyplot_api.html#matplotlib.pyplot.specgram
+
+Returns the tuple (spectrum, freqs, t, im):
+
+spectrum: 2-D array
+columns are the periodograms of successive segments (ie, the value/color)
+
+freqs: 1-D array
+The frequencies corresponding to the rows in spectrum (ie, the rows, evenly spaced, which vary based on sample rate)
+
+t: 1-D array
+The times corresponding to midpoints of segments (ie the columns, evenly spaced (not logarithmic?, vary on length)
+
+
+im: instance of class AxesImage
+The image created by imshow containing the spectrogram
+
+
+
+
+so... just need the spectrum to plot. what's the range of the values?
+
+
+
+could use this instead:
+http://scipy.github.io/devdocs/generated/scipy.signal.spectrogram.html
+
+
+so what's the goal?
+
+for a given time period, get the density and entropy 
+
+
+amount (how much)
+density (how clumpy)
+entropy (how organized the clumps)
+markov (the linear relationships)
+
+but all of this assumes the fundamentals are detectable.
+
+for listening box, we want to find holes. 
+
+so the output would just be a strip of frequencies, with the average intensity in each.
+
+for the piano strings project, it's the same.  (that piece is kind of like physical convolution)
+
+need to have a time based model. so what is that? just distribution
+
+"""        
