@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import signal_processing as sp
 from plotter import plot
-from sound import SoundSignal
+from housepy.sound import Sound
 
 filename = "output.wav"
 filename = "camp_2_11khz_16_mono.wav"
@@ -21,7 +21,7 @@ filename = "robin_chat_sample_11k_16_mono.wav"
 # filename = "reeds_short_22khz_16_mono.wav"
 # filename = "reeds_shorter_22khz_16_mono.wav"
 
-sound = SoundSignal().load(filename)
+sound = Sound().load(filename)
 # sound = SoundSignal().record(5)
 # sound.play()
 
@@ -32,7 +32,7 @@ sound = SoundSignal().load(filename)
 # sound.plot()
 # sound.play()
 
-sound.spectrum()
-# sound.plot()
+# sound.spectrum()
+sound.plot()
 
 ## 24-bit does not work
