@@ -8,55 +8,60 @@ from housepy.sound import Sound
 # from scipy.signal import spectrogram
 
 
-filename = "robin_chat_sample_11k_16_mono.wav"
-sound = Sound().load(filename)
 
 
-block_size = 512
-block_overlap = block_size / 2 # power of two, default is 128        
+def spectrum(signal, rate):
 
-# freqs, ts, spectrum = spectrogram(sound.signal, fs=sound.rate, noverlap=block_overlap, nfft=block_size, detrend='constant', return_onesided=True, scaling='density', axis=-1, mode='psd', window=('tukey', 0.25), nperseg=block_overlap*2)       
-spectrum, freqs, ts, image = plt.specgram(sound.signal, NFFT=block_size, Fs=sound.rate, noverlap=block_overlap)
+    block_size = 512
+    block_overlap = block_size / 2 # power of two, default is 128        
 
-# (plt is 3k smaller)
+    # freqs, ts, spectrum = spectrogram(sound.signal, fs=sound.rate, noverlap=block_overlap, nfft=block_size, detrend='constant', return_onesided=True, scaling='density', axis=-1, mode='psd', window=('tukey', 0.25), nperseg=block_overlap*2)       
+    spectrum, freqs, ts, image = plt.specgram(signal, NFFT=block_size, Fs=rate, noverlap=block_overlap)
 
-# print("spectrum", spectrum) # freq rows of time columns. 
-# print()
-# print(freqs)
-# print()
-# print(ts)
+    # (plt is 3k smaller)
 
-log.info("--> freq bins %s" % len(freqs))
-log.info("--> time columns %s" % len(ts))
+    # print("spectrum", spectrum) # freq rows of time columns. 
+    # print()
+    # print(freqs)
+    # print()
+    # print(ts)
+
+    log.info("--> freq bins %s" % len(freqs))
+    log.info("--> time columns %s" % len(ts))
 
 
-# with gzip.open("spectrum.pklz", 'wb') as f:
-#     f.write(pickle.dumps(spectrum))
+    # with gzip.open("spectrum.pklz", 'wb') as f:
+    #     f.write(pickle.dumps(spectrum))
 
-ctx = drawing.Context(len(ts) * 1, len(freqs) * 1, relative=True)           # if it's not an even multiple, artifacts happen
+    ctx = drawing.Context(len(ts) * 1, len(freqs) * 1, relative=True)           # if it's not an even multiple, artifacts happen
 
-pixel_width = ctx.width / len(spectrum[0])
-pixel_height = ctx.height / len(spectrum)
+    pixel_width = ctx.width / len(spectrum[0])
+    pixel_height = ctx.height / len(spectrum)
 
-# for y, row in enumerate(spectrum):
-#     for x, value in enumerate(row):
-#         v = min(value / (allmax / 500), 1.0)
-#         v = 1 - v
-#         # print((x * pixel_width) / ctx.width, (y * pixel_height) / ctx.height, pixel_width / ctx.width, pixel_height / ctx.height)
-#         ctx.rect((x * pixel_width) / ctx.width, (y * pixel_height) / ctx.height, pixel_width / ctx.width, pixel_height / ctx.height, fill=(v, v, v, 1.), stroke=(1., 0., 0., 0.), thickness=0.0)
+    # for y, row in enumerate(spectrum):
+    #     for x, value in enumerate(row):
+    #         v = min(value / (allmax / 500), 1.0)
+    #         v = 1 - v
+    #         # print((x * pixel_width) / ctx.width, (y * pixel_height) / ctx.height, pixel_width / ctx.width, pixel_height / ctx.height)
+    #         ctx.rect((x * pixel_width) / ctx.width, (y * pixel_height) / ctx.height, pixel_width / ctx.width, pixel_height / ctx.height, fill=(v, v, v, 1.), stroke=(1., 0., 0., 0.), thickness=0.0)
 
-for y, row in enumerate(spectrum):
-    for x, value in enumerate(row):
-        # v = min(value / (allmax / 1000), 1.0)
-        v = np.sqrt(value.max()) 
-        # v = v if v > 20 else 0
-        v /= 100      ## really out of 100? "The peak height in the power spectrum is an estimate of the RMS amplitude."
-        # v = value.max() / (100 * 100)           ## less compression
-        # v = 1 - v
-        ctx.line((x * pixel_width) / ctx.width, (y * pixel_height) / ctx.height, ((x * pixel_width) + pixel_width) / ctx.width, (y * pixel_height) / ctx.height, stroke=(v, v, v, 1.), thickness=pixel_height)
+    for y, row in enumerate(spectrum):
+        for x, value in enumerate(row):
+            # v = min(value / (allmax / 1000), 1.0)
+            v = np.sqrt(value.max()) 
+            # v = v if v > 20 else 0
+            v /= 100      ## really out of 100? "The peak height in the power spectrum is an estimate of the RMS amplitude."
+            # v = value.max() / (100 * 100)           ## less compression
+            # v = 1 - v
+            ctx.line((x * pixel_width) / ctx.width, (y * pixel_height) / ctx.height, ((x * pixel_width) + pixel_width) / ctx.width, (y * pixel_height) / ctx.height, stroke=(v, v, v, 1.), thickness=pixel_height)
 
-ctx.output("charts/")
+    ctx.output("charts/")
 
+
+if __name__ == "__main__":
+    filename = "robin_chat_sample_11k_16_mono.wav"
+    sound = Sound().load(filename)
+    spectrum(sound.signal, sound.rate)
 
 
 """
