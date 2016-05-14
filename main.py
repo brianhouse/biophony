@@ -5,7 +5,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import signal_processing as sp
-from plotter import plot
 from housepy.sound import Sound
 
 filename = "output.wav"
@@ -31,8 +30,3 @@ sound = Sound().load(filename)
 
 # sound.plot()
 # sound.play()
-
-# sound.spectrum()
-sound.plot()
-
-## 24-bit does not work

@@ -32,30 +32,32 @@ values = data['values']
 # http://www.usbr.gov/pn-bin/instant.pl?station=ABEI&year=2015&month=7&day=1&year=2016&month=6&day=1&pcode=OB
 
 log.info("Converting to 0-1 signal...")
-signal = sp.resample(ts, values)
+signal = sp.resample(ts, values, len(ts))
 signal = sp.normalize(signal)
 log.info("--> done")
 
-log.info("Drawing...")
-ctx = drawing.Context(6000, 500)
-ctx.plot(signal)
-ctx.output("audification_signals/")
-log.info("--> done")
+# log.info("Drawing...")
+# ctx = drawing.Context(6000, 500)
+# ctx.plot(signal)
+# ctx.output("audification_signals/")
+# log.info("--> done")
 
 
-signal = sp.make_audio(signal)
+audio_signal = sp.make_audio(signal)
 
 
-from spectrometer import spectrum
+# import subprocess
+# filename = "weather_test_44.wav"
+# sound.write_audio(audio_signal, filename)
+# subprocess.call(["open", filename])
 
-filename = "weather_test_44.wav"
-sound.write_audio(signal, filename)
-
-import subprocess
-subprocess.call(["open", filename])
+# from spectrometer import spectrum
+# spectrum(audio_signal, 11025)
 
 
-spectrum(signal, 11025)
+ac = sp.autocorrelate(signal)
+
+print(ac)
 
 
 """

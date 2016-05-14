@@ -6,17 +6,22 @@ import numpy as np
 from housepy import drawing, log
 from housepy.sound import Sound
 # from scipy.signal import spectrogram
+import signal_processing as sp
 
 
 
 
 def spectrum(signal, rate):
 
+    log.info("Computing spectrogram...")
+
     block_size = 512
     block_overlap = block_size / 2 # power of two, default is 128        
 
     # freqs, ts, spectrum = spectrogram(sound.signal, fs=sound.rate, noverlap=block_overlap, nfft=block_size, detrend='constant', return_onesided=True, scaling='density', axis=-1, mode='psd', window=('tukey', 0.25), nperseg=block_overlap*2)       
     spectrum, freqs, ts, image = plt.specgram(signal, NFFT=block_size, Fs=rate, noverlap=block_overlap)
+
+
 
     # (plt is 3k smaller)
 
@@ -26,8 +31,11 @@ def spectrum(signal, rate):
     # print()
     # print(ts)
 
+    log.info("--> done")
     log.info("--> freq bins %s" % len(freqs))
     log.info("--> time columns %s" % len(ts))
+
+    log.info("Drawing...")
 
 
     # with gzip.open("spectrum.pklz", 'wb') as f:
@@ -45,16 +53,17 @@ def spectrum(signal, rate):
     #         # print((x * pixel_width) / ctx.width, (y * pixel_height) / ctx.height, pixel_width / ctx.width, pixel_height / ctx.height)
     #         ctx.rect((x * pixel_width) / ctx.width, (y * pixel_height) / ctx.height, pixel_width / ctx.width, pixel_height / ctx.height, fill=(v, v, v, 1.), stroke=(1., 0., 0., 0.), thickness=0.0)
 
+    # mx = spectrum.flatten().max()
+    # print("maximum", spectrum.flatten().max())
+    # print("minimum", spectrum.flatten().min())
+
+    spectrum = sp.normalize(np.sqrt(spectrum), 0.0, 200.0) # sqrt compresses, good for power. 200 is a clipping threshold.
+    
     for y, row in enumerate(spectrum):
-        for x, value in enumerate(row):
-            # v = min(value / (allmax / 1000), 1.0)
-            v = np.sqrt(value.max()) 
-            # v = v if v > 20 else 0
-            v /= 100      ## really out of 100? "The peak height in the power spectrum is an estimate of the RMS amplitude."
-            # v = value.max() / (100 * 100)           ## less compression
-            # v = 1 - v
+        for x, v in enumerate(row):
             ctx.line((x * pixel_width) / ctx.width, (y * pixel_height) / ctx.height, ((x * pixel_width) + pixel_width) / ctx.width, (y * pixel_height) / ctx.height, stroke=(v, v, v, 1.), thickness=pixel_height)
 
+    log.info("--> done")
     ctx.output("charts/")
 
 

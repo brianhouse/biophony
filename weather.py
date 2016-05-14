@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
-import requests, json, time
-from housepy import config, log, util
+import requests, json, time, os
+from housepy import config, log, util, process
 
-
+process.secure_pid(os.path.abspath(os.path.join(os.path.dirname(__file__), "run")))
 
 while True:
 
