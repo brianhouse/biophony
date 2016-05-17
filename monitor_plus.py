@@ -9,6 +9,8 @@ import signal_processing as sp
 
 # should I be using the new async?
 
+THRESHOLD = 1000000
+
 display_spectrums = queue.Queue()
 
 class SoundPull(threading.Thread):
@@ -24,7 +26,7 @@ class SoundPull(threading.Thread):
         while True:
             # filename = "robin_chat_sample_11k_16_mono.wav"                        
             # sound = Sound().load(filename)            
-            sound = Sound().record(10)
+            sound = Sound().record(10, keep_file=False)
             block_size = 512
             block_overlap = block_size / 2 # power of two, default is 128        
             spectrum, freqs, ts, image = plt.specgram(sound.signal, NFFT=block_size, Fs=sound.rate, noverlap=block_overlap)            
@@ -33,6 +35,11 @@ class SoundPull(threading.Thread):
 
             spectrum = sp.normalize(np.sqrt(spectrum), 0.0, 100.0) # sqrt compresses, good for power. 200 is a clipping threshold.
             spectrum = sp.rescale(spectrum, 0, 255)
+
+            s = np.sum(spectrum)
+            log.info("--> SUM %s" % s)
+            if s < THRESHOLD:
+                continue
 
             num_spectrums += 1
             if spectrum_sum is None:
